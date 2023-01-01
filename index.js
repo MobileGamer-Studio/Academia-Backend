@@ -7,6 +7,8 @@ const mod = require("./feed-manager.js");
 
 app.get("/", (req, res) => res.send('Academia Backend'));
 
+app.use(express.static('data'))
+
 app.listen(port, () => mod.GetCollectionData().then(() => mod.SetFeedData()));
 
 
