@@ -1,9 +1,6 @@
-
-const express = require("express");
-const app = express();
-const bodyParser = require('body-parser');
-const cors = require("cors")
-const route = process.env.PORT || 3000;
+const http = require('http');
+const hostname = '127.0.0.1';
+const port = 3000;
 
 const { initializeApp, applicationDefault, cert } = require('firebase-admin/app');
 const { getFirestore, Timestamp, FieldValue } = require('firebase-admin/firestore');
@@ -18,10 +15,12 @@ initializeApp({
 
 const firestore = getFirestore();
 
-const ManageData = async () => {
-  // get collection
-  const users = await firestore.collection('Users').get();
-  console.log(users.docs.map(doc => doc.data()));
-}
+const server = http.createServer((req, res) => {
+  res.statusCode = 200;
+  res.setHeader('Content-Type', 'text/plain');
+  res.end('Hello World');
+});
 
-ManageData();
+server.listen(port, hostname, () => {
+  console.log(`Server running at http://${hostname}:${port}/`);
+});
