@@ -15,28 +15,7 @@ const firestore = getFirestore();
 
 const GetCollectionData = async () => {
 
-    const productRef = firestore.collection('Products');
-    const userRef = firestore.collection('Users');
-
-
-    productRef.onSnapshot(snapshot => {
-        const products = snapshot.docs.map(doc => doc.data());
-
-        fs.writeFileSync("./data/products.json", JSON.stringify(products), 'utf8')
-    }, err => {
-        console.log(`Encountered error: ${err}`);
-    })
-
-
-    userRef.onSnapshot(snapshot => {
-        const users = snapshot.docs.map(doc => doc.data());
-
-        fs.writeFileSync("./data/users.json", JSON.stringify(users), 'utf8')
-
-
-    }, err => {
-        console.log(`Encountered error: ${err}`);
-    })
+    
 
 
 
