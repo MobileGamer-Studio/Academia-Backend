@@ -31,13 +31,14 @@ app.listen(port, async () => {
         fs.writeFileSync("./data/products.json", JSON.stringify(products), 'utf8')
 
 
-        firestore.collection('Users').get().then(snapshot => {
+        firestore.collection('Users').get().then( async (snapshot) => {
             const users = snapshot.docs.map(doc => doc.data());
 
-            const suggestedProducts = products.sort((p1, p2) => (p1.ratings < p2.ratings) ? 1 : (p1.ratings > p2.ratings) ? -1 : 0);
-            const suggestedUsers = users.sort((p1, p2) => (p1.userInfo.rating < p2.userInfo.rating) ? 1 : (p1.userInfo.rating > p2.userInfo.rating) ? -1 : 0);
-            suggestedUsers.sort((p1, p2) => (p1.sellerInfo.rating < p2.sellerInfo.rating) ? 1 : (p1.sellerInfo.rating > p2.sellerInfo.rating) ? -1 : 0);
-            const bestSellers = products.sort((p1, p2) => (p1.sold < p2.sold) ? 1 : (p1.sold > p2.sold) ? -1 : 0);
+            const suggestedProducts = await productRef.orderBy('ratings', 'desc').get();
+            const suggestedUsers = await userRef.orderBy('userInfo.rating', 'desc').get();
+            const bestSellers = await productRef.orderBy('sold', 'desc').get();
+            const sales = await productRef.orderBy('discount', 'desc').get();
+            
             const activity = []
 
             users.forEach(user => {
@@ -49,8 +50,6 @@ app.listen(port, async () => {
                     })
                 })
             });
-
-            const sales = products.sort((p1, p2) => (p1.discount < p2.discount) ? 1 : (p1.discount > p2.discount) ? -1 : 0);
 
             let spList = [];
             suggestedProducts.forEach(product => {
