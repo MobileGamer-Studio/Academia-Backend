@@ -30,8 +30,19 @@ app.listen(port, async () => {
 
         fs.writeFileSync("./data/products.json", JSON.stringify(products), 'utf8')
 
+        products.forEach(product => {
+            //This gives the product a rating based on likes and dislikes (out of five)
+            const total_votes = product.likes + product.dislikes
+            const ratio = product.likes / total_votes
+            const rating = ratio * 5
 
-        firestore.collection('Users').get().then( async (snapshot) => {
+            productRef.doc(product.id).update({
+                ratings: rating
+            })
+        })
+
+
+        firestore.collection('Users').get().then(async (snapshot) => {
             const users = snapshot.docs.map(doc => doc.data());
 
             const suggestedProducts = await productRef.orderBy('ratings', 'desc').get();
@@ -45,11 +56,25 @@ app.listen(port, async () => {
                 user.userInfo.recentlyViewed.forEach(productId => {
                     products.forEach(product => {
                         if (product.id == productId) {
-                            activity.push(product);
+                            if(activity.includes(product) === false) {
+                                activity.push(product);
+                            }
+                        }
+                    })
+                })
+
+                products.forEach(product => {
+                    product.tags.forEach(tag => {
+                        if (user.userInfo.tags.includes(tag)) {
+                            if (suggestedProducts.includes(product) === false) {
+                                suggestedProducts.unshift(product);
+                            }
                         }
                     })
                 })
             });
+
+            
 
             let spList = [];
             suggestedProducts.forEach(product => {
