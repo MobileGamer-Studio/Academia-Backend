@@ -1,20 +1,10 @@
-const { initializeApp, cert } = require('firebase-admin/app');
-const { getFirestore } = require('firebase-admin/firestore');
+const { app, db } = require('./firebase');
 const fs = require('fs');
-
-const serviceAccount = require("./academia-c3d0e-firebase-adminsdk-o1rr9-7e2532c12c.json");
-
-initializeApp({
-  credential: cert(serviceAccount),
-  databaseURL: "https://academia-c3d0e-default-rtdb.firebaseio.com"
-});
-
-const firestore = getFirestore();
 
 const fetchData = async () => {
   try {
-    const productRef = firestore.collection('Products');
-    const userRef = firestore.collection('Users');
+    const productRef = db.collection('Products');
+    const userRef = db.collection('Users');
 
     const snapshot = await productRef.get();
     const products = snapshot.docs.map(doc => doc.data());
@@ -101,7 +91,7 @@ const fetchData = async () => {
 
     users.forEach(user => {
       user.userInfo.feed = defaultFeed;
-      firestore.collection('Users').doc(user.id).set(user);
+      db.collection('Users').doc(user.id).set(user);
       console.log(user.name + " feed updated");
     });
 
